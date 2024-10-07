@@ -1,1 +1,15 @@
+# Entornos virtuales
 env/
+venv/
+ENV/
+.venv/
+.ENV/
+# Archivos de configuración de Python
+*.pyc
+__pycache__/
+migrations/
+local_settings.py
+db.sqlite3
+
+# Otros
+.idea/
