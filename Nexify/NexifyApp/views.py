@@ -104,3 +104,15 @@ class CustomAuthToken(ObtainAuthToken):
             'user_id': user.pk,
             'username': user.username
         })
+
+#CategoriaEventoViewSet
+class CategoriaEventoViewSet(viewsets.ModelViewSet):
+    queryset = models.CategoriaEvento.objects.all()
+    serializer_class = serializers.CategoriaEventoSerializer
+    permission_classes = [IsAuthenticated]
+
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
+
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)

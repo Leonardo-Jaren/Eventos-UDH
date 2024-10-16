@@ -1,11 +1,12 @@
 from rest_framework import routers
 from . import views
 from django.urls import path, include
-from .views import EventoViewSet, ChatAPIView, MensajeAPIView
+from .views import EventoViewSet, ChatAPIView, MensajeAPIView, CategoriaEventoViewSet
 
 router = routers.DefaultRouter()
 router.register('eventos', views.EventoViewSet)
 router.register('usuario', views.UsuarioViewSet)
+router.register('categoria', views.CategoriaEventoViewSet)
 
 urlpatterns = [ 
     path('messages', MensajeAPIView.as_view()), #desactivar para dejar de hacer pruebas
