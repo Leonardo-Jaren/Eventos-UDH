@@ -110,10 +110,6 @@ class LoginView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        api_key = request.headers.get('API-KEY')
-        if api_key != settings.API_KEY:
-            return Response({'error': 'Invalid API Key'}, status=401)
-        
         username = request.data.get('username')
         password = request.data.get('password')
         user = authenticate(username=username, password=password)

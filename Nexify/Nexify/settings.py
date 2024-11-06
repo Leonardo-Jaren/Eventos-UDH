@@ -55,7 +55,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'NexifyApp.middleware.APIKeyMiddleware',
+    #'NexifyApp.middleware.APIKeyMiddleware',
 ]
 
 
@@ -142,10 +142,16 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ORIGIN_ALLOW_ALL = True
 
-CORS_ALLOW_HEADERS = list(default_headers) + [
+CORS_ALLOW_HEADERS = [
     'API-KEY',
+    'authorization',
+    'content-type',
+    'x-csrftoken',
 ]
 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:4200",
+]
 
 AUTH_USER_MODEL = 'NexifyApp.Usuario'
 
