@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    "NexifyApp",
+    'NexifyApp',
     'rest_framework',
     'rest_framework.authtoken',
     #cors
@@ -126,6 +126,8 @@ USE_I18N = True
 
 USE_TZ = True
 
+
+API_KEY='1cf535c7f0f585ab0e4a29419d62c048296a4cd1'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
