@@ -85,15 +85,10 @@ WSGI_APPLICATION = 'Nexify.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'nexify',
-        'USER': 'root',
-        'PASSWORD': '',
-        'HOST': 'localhost',
-        'PORT': '3306',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -155,4 +150,4 @@ CORS_ALLOWED_ORIGINS = [
 
 AUTH_USER_MODEL = 'NexifyApp.Usuario'
 
-API_KEY = '1cf535c7f0f585ab0e4a29419d62c048296a4cd1'
+API_KEY = 'fe1147108cf466dc2085a0cf14757bc1a4974a11'

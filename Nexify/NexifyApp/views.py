@@ -19,7 +19,7 @@ from django.contrib.auth import authenticate
 class EventoViewSet(viewsets.ModelViewSet):
     queryset = Evento.objects.all()
     serializer_class = EventoSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny] #AllowAny
 
     def create(self, request, *args, **kwargs):
         # Aquí puedes personalizar la creación del evento
@@ -86,7 +86,7 @@ class MesageAPIView(APIView):
 class UsuarioViewSet(viewsets.ModelViewSet):
     queryset = models.Usuario.objects.all()
     serializer_class = serializers.UsuarioSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny] #IsAuthenticated
 
     def create(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
@@ -98,7 +98,7 @@ class UsuarioViewSet(viewsets.ModelViewSet):
 class CategoriaEventoViewSet(viewsets.ModelViewSet):
     queryset = models.CategoriaEvento.objects.all()
     serializer_class = serializers.CategoriaEventoSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny] #IsAuthenticated
 
     def create(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)

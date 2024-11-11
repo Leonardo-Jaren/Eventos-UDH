@@ -26,7 +26,11 @@ class UsuarioSerializer(serializers.ModelSerializer):
         user = models.Usuario(
             email = validated_data['email'],
             username = validated_data['username'],
-            rol=validated_data['rol']
+            rol=validated_data['rol'],
+            telefono=validated_data['telefono'],
+            url_linkedin=validated_data['url_linkedin'],
+            rango=validated_data['rango'],
+            eventos_asistidos=validated_data['eventos_asistidos']
         )
         user.set_password(validated_data['password'])
         user.save()
