@@ -19,7 +19,7 @@ from django.contrib.auth import authenticate
 class EventoViewSet(viewsets.ModelViewSet):
     queryset = Evento.objects.all()
     serializer_class = EventoSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny] #AllowAny
 
     def create(self, request, *args, **kwargs):
         # Aquí puedes personalizar la creación del evento
