@@ -13,3 +13,6 @@ db.sqlite3
 
 # Otros
 .idea/
+
+# Carpeta de archivos estáticos
+Frontend/

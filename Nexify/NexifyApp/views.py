@@ -12,12 +12,14 @@ from .pusher import pusher_client
 from rest_framework.permissions import AllowAny
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
+from django.conf import settings
+from django.contrib.auth import authenticate
 
 # Vista para manejar los eventos
 class EventoViewSet(viewsets.ModelViewSet):
     queryset = Evento.objects.all()
     serializer_class = EventoSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny] #AllowAny
 
     def create(self, request, *args, **kwargs):
         # Aquí puedes personalizar la creación del evento
@@ -92,19 +94,6 @@ class UsuarioViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
-
-class CustomAuthToken(ObtainAuthToken):
-    def post(self, request, *args, **kwargs):
-        serializers = self.serializer_class(data=request.data, context={'request':request})
-        serializers.is_valid(raise_exception=True)
-        user = serializers.validated_data['user']
-        token, created = Token.objects.get_or_create(user=user)
-        return Response({
-            'token': token.key,
-            'user_id': user.pk,
-            'username': user.username
-        })
-
 #CategoriaEventoViewSet
 class CategoriaEventoViewSet(viewsets.ModelViewSet):
     queryset = models.CategoriaEvento.objects.all()
@@ -116,3 +105,20 @@ class CategoriaEventoViewSet(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
+
+class LoginView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        api_key = request.headers.get('API-KEY')
+        if api_key != settings.API_KEY:
+            return Response({'error': 'Invalid API Key'}, status=401)
+        
+        username = request.data.get('username')
+        password = request.data.get('password')
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            token, _ = Token.objects.get_or_create(user=user)
+            return Response({'token': token.key})
+        else:
+            return Response({'error': 'Invalid credentials'}, status=400)

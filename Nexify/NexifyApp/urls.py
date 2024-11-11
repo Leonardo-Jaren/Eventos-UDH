@@ -11,7 +11,7 @@ router.register('categoria', views.CategoriaEventoViewSet)
 urlpatterns = [ 
     path('messages', MensajeAPIView.as_view()), #desactivar para dejar de hacer pruebas
     path('', include(router.urls)),
-    path('token-auth/', views.CustomAuthToken.as_view(),name='token-auth'),
+    path('login/', views.LoginView.as_view(), name='login'),
     path('chat/<int:evento_id>/', ChatAPIView.as_view(), name='chat'),
     path('mensaje/<int:chat_id>/', MensajeAPIView.as_view(), name='mensaje'),
 ]
