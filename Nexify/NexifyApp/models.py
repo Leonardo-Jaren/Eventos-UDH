@@ -55,7 +55,7 @@ class Evento(models.Model):
     nombre_evento = models.CharField(max_length=200)
     descripcion = models.TextField()
     fecha_evento = models.DateTimeField()
-    categoria_evento = models.ForeignKey(CategoriaEvento, on_delete=models.CASCADE, null=True, blank=True)
+    categoria_evento = models.ForeignKey(CategoriaEvento, on_delete=models.CASCADE)
     TIPO_EVENTO_CHOICES = [
         ('Virtual', 'Virtual'),
         ('Presencial', 'Presencial'),

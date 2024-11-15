@@ -3,6 +3,7 @@ from . import models
 from .models import Evento, Chat, Mensaje, Usuario
 
 class EventoSerializer(serializers.ModelSerializer):
+    tipoTexto = serializers.ReadOnlyField(source='categoria_evento.nombre_categoria')
     class Meta:
         model = Evento
         fields = '__all__'  # O especifica los campos que quieras
@@ -40,3 +41,4 @@ class CategoriaEventoSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.CategoriaEvento
         fields = '__all__'
+        
