@@ -1,5 +1,6 @@
 from pathlib import Path
 from corsheaders.defaults import default_headers
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -145,3 +146,6 @@ AUTH_USER_MODEL = 'NexifyApp.Usuario'
 
 # Configuración de la API Key (si se usa en APIKeyMiddleware)
 API_KEY = 'fe1147108cf466dc2085a0cf14757bc1a4974a11'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
