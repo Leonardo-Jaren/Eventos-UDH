@@ -8,6 +8,7 @@ router.register('eventos', views.EventoViewSet)
 router.register('usuario', views.UsuarioViewSet)
 router.register('categoria', views.CategoriaEventoViewSet)
 
+
 urlpatterns = [ 
     path('messages', MensajeAPIView.as_view()), #desactivar para dejar de hacer pruebas
     path('', include(router.urls)),

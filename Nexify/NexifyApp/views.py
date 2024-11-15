@@ -86,7 +86,7 @@ class MesageAPIView(APIView):
 class UsuarioViewSet(viewsets.ModelViewSet):
     queryset = models.Usuario.objects.all()
     serializer_class = serializers.UsuarioSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny] #IsAuthenticated
 
     def create(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
@@ -98,7 +98,7 @@ class UsuarioViewSet(viewsets.ModelViewSet):
 class CategoriaEventoViewSet(viewsets.ModelViewSet):
     queryset = models.CategoriaEvento.objects.all()
     serializer_class = serializers.CategoriaEventoSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny] #IsAuthenticated
 
     def create(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
@@ -110,15 +110,20 @@ class LoginView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        api_key = request.headers.get('API-KEY')
-        if api_key != settings.API_KEY:
-            return Response({'error': 'Invalid API Key'}, status=401)
-        
+        # Obtiene el nombre de usuario y la contraseña de la solicitud
         username = request.data.get('username')
         password = request.data.get('password')
+
+        # Valida los datos de entrada
+        if not username or not password:
+            return Response({'error': 'Se requiere nombre de usuario y contraseña'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Autentica al usuario
         user = authenticate(username=username, password=password)
         if user is not None:
+            # Si la autenticación es exitosa, genera o recupera el token
             token, _ = Token.objects.get_or_create(user=user)
             return Response({'token': token.key})
         else:
-            return Response({'error': 'Invalid credentials'}, status=400)
+            # Si la autenticación falla, retorna un error
+            return Response({'error': 'Credenciales incorrectas'}, status=status.HTTP_400_BAD_REQUEST)
