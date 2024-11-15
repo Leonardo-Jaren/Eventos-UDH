@@ -4,7 +4,6 @@ from corsheaders.defaults import default_headers
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
@@ -14,8 +13,7 @@ SECRET_KEY = 'django-insecure-v6x#iji2_#+$6#6anemtvi8-b(l4^3s#ij#c+v--(#1)_3ei&7
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']  # Asegúrate de incluir localhost y 127.0.0.1 aquí
 
 # Application definition
 
@@ -34,17 +32,15 @@ INSTALLED_APPS = [
     'corsheaders',
 ]
 
-
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES' : [
-        'rest_framework.permissions.IsAuthenticated'
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',  # Cambia a AllowAny para permitir acceso temporalmente
     ],
-    'DEFAULT_AUTHENTICATION_CLASSES' : [
+    'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication'
     ]
 }
-
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -55,9 +51,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    #'NexifyApp.middleware.APIKeyMiddleware',
+    # 'NexifyApp.middleware.APIKeyMiddleware',  # Descomentarlo si es necesario
 ]
-
 
 ROOT_URLCONF = 'Nexify.urls'
 
@@ -79,7 +74,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'Nexify.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
@@ -97,32 +91,24 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
-
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
     },
-
     {
         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
     },
-    
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
@@ -134,20 +120,28 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Solo en desarrollo
+CORS_ALLOW_ALL_ORIGINS = True
 
-CORS_ORIGIN_ALLOW_ALL = True
+# Configuración de CORS
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:4200",
+    "http://127.0.0.1:4200",
+]
 
-CORS_ALLOW_HEADERS = [
+# Permitir todos los encabezados (opcional para desarrollo)
+CORS_ALLOW_HEADERS = list(default_headers) + [
     'API-KEY',
     'authorization',
     'content-type',
     'x-csrftoken',
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:4200",
-]
+# Opcional: para habilitar todos los orígenes en desarrollo
+# CORS_ALLOW_ALL_ORIGINS = True  # Esto debería ser True solo en desarrollo y se recomienda comentarlo en producción
 
+# Autenticación de usuario personalizada
 AUTH_USER_MODEL = 'NexifyApp.Usuario'
 
+# Configuración de la API Key (si se usa en APIKeyMiddleware)
 API_KEY = 'fe1147108cf466dc2085a0cf14757bc1a4974a11'
