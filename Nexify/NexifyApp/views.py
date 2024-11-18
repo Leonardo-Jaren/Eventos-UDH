@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import viewsets
 from . import models, serializers
-from .serializers import EventoSerializer, ChatSerializer, MensajeSerializer
+from .serializers import EventoSerializer, ChatSerializer, MensajeSerializer, UsuarioSerializer
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.response import Response
@@ -10,10 +10,11 @@ from .models import Chat, Mensaje, Evento
 from rest_framework.permissions import IsAuthenticated
 from .pusher import pusher_client
 from rest_framework.permissions import AllowAny
-from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
-from django.conf import settings
 from django.contrib.auth import authenticate
+from rest_framework.decorators import api_view
+from .models import Usuario
+
 
 # Vista para manejar los eventos
 class EventoViewSet(viewsets.ModelViewSet):
@@ -86,13 +87,19 @@ class MesageAPIView(APIView):
 class UsuarioViewSet(viewsets.ModelViewSet):
     queryset = models.Usuario.objects.all()
     serializer_class = serializers.UsuarioSerializer
-    permission_classes = [AllowAny] #IsAuthenticated
+    permission_classes = [AllowAny]
 
     def create(self, request, *args, **kwargs):
-        return super().create(request, *args, **kwargs)
-
-    def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        # Guardar el usuario con la contraseña cifrada
+        user = serializer.save()
+        user.set_password(serializer.validated_data['password'])
+        user.save()
+        
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 #CategoriaEventoViewSet
 class CategoriaEventoViewSet(viewsets.ModelViewSet):
@@ -110,15 +117,47 @@ class LoginView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        api_key = request.headers.get('API-KEY')
-        if api_key != settings.API_KEY:
-            return Response({'error': 'Invalid API Key'}, status=401)
-        
+        # Obtiene el nombre de usuario y la contraseña de la solicitud
         username = request.data.get('username')
         password = request.data.get('password')
+
+        # Valida los datos de entrada
+        if not username or not password:
+            return Response({'error': 'Se requiere nombre de usuario y contraseña'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Autentica al usuario
         user = authenticate(username=username, password=password)
         if user is not None:
+            # Si la autenticación es exitosa, genera o recupera el token
             token, _ = Token.objects.get_or_create(user=user)
             return Response({'token': token.key})
         else:
-            return Response({'error': 'Invalid credentials'}, status=400)
+            # Si la autenticación falla, retorna un error
+            return Response({'error': 'Credenciales incorrectas'}, status=status.HTTP_400_BAD_REQUEST)
+        
+class RegisterView(APIView):
+    def post(self, request):
+        serializer = UsuarioSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "Usuario registrado con éxito."}, status=status.HTTP_201_CREATED)
+        # Devolver errores específicos
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(['GET'])
+def coordinadores(request):
+    coordinadores = Usuario.objects.filter(rol='Coordinador')
+    serializer = UsuarioSerializer(coordinadores, many=True)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+def ponentes(request):
+    ponentes = Usuario.objects.filter(rol='Ponente')
+    serializer = UsuarioSerializer(ponentes, many=True)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+def moderadores(request):
+    moderadores = Usuario.objects.filter(rol='Moderador_Solicitud')
+    serializer = UsuarioSerializer(moderadores, many=True)
+    return Response(serializer.data)

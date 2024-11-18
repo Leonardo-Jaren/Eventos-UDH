@@ -7,6 +7,7 @@ class APIKeyMiddleware:
 
     def __call__(self, request):
         api_key = request.headers.get('API-KEY')
+        print(api_key)
         if api_key != settings.API_KEY:
             return JsonResponse({'error': 'Invalid API Key'}, status=401)
         return self.get_response(request)

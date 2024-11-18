@@ -21,21 +21,29 @@ class MensajeSerializer(serializers.ModelSerializer):
 class UsuarioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Usuario
-        fields = '__all__'
-        read_only_fields = ['id','last_login','is_superuser','is_staff','is_active','date_joined','groups','user_permissions','first_name','last_name']
+        fields = ['username', 'password', 'email', 'rol', 'telefono']
+        extra_kwargs = {
+            'password': {'write_only': True},  # No devolver la contraseña en las respuestas
+        }
+
+    def validate(self, data):
+        # Validar que todos los campos requeridos estén presentes
+        if not data.get('username') or not data.get('password') or not data.get('email') or not data.get('rol'):
+            raise serializers.ValidationError("Todos los campos son obligatorios.")
+        return data
+
     def create(self, validated_data):
-        user = models.Usuario(
-            email = validated_data['email'],
-            username = validated_data['username'],
+        # Crear el usuario y asegurar que la contraseña esté hasheada
+        user = Usuario(
+            username=validated_data['username'],
+            email=validated_data['email'],
             rol=validated_data['rol'],
-            telefono=validated_data['telefono'],
-            url_linkedin=validated_data['url_linkedin'],
-            rango=validated_data['rango'],
-            eventos_asistidos=validated_data['eventos_asistidos']
+            telefono=validated_data.get('telefono', None),  # Campo opcional
         )
-        user.set_password(validated_data['password'])
+        user.set_password(validated_data['password'])  # Hashear la contraseña
         user.save()
         return user
+
 
 class CategoriaEventoSerializer(serializers.ModelSerializer):
     class Meta:

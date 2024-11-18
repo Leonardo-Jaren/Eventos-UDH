@@ -68,6 +68,9 @@ class Evento(models.Model):
     moderador_necesario = models.BooleanField(default=False)
     moderador = models.ForeignKey(Usuario, limit_choices_to={'rol': 'Moderador_Solicitud'}, on_delete=models.SET_NULL, null=True, blank=True, related_name='eventos_moderados')
     participantes = models.ManyToManyField(Participante, through='Participantes', related_name='eventos')
+    imagen = models.ImageField(upload_to='imagenes_eventos/', null=True, blank=True)
+    hora_inicio = models.TimeField(null=True, blank=True)
+    hora_fin = models.TimeField(null=True, blank=True)
 
     @property
     def estado_evento(self):
