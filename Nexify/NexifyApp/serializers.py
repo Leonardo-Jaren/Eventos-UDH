@@ -20,9 +20,10 @@ class MensajeSerializer(serializers.ModelSerializer):
 class UsuarioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Usuario
-        fields = ['username', 'password', 'email', 'rol', 'telefono']
+        fields = ['username', 'password', 'email', 'rol', 'telefono', 'foto_perfil']
         extra_kwargs = {
             'password': {'write_only': True},  # No devolver la contraseña en las respuestas
+            'foto_perfil': {'required': False},  # Campo opcional
         }
 
     def validate(self, data):
@@ -38,6 +39,7 @@ class UsuarioSerializer(serializers.ModelSerializer):
             email=validated_data['email'],
             rol=validated_data['rol'],
             telefono=validated_data.get('telefono', None),  # Campo opcional
+            foto_perfil=validated_data.get('foto_perfil', None)  # Campo opcional
         )
         user.set_password(validated_data['password'])  # Hashear la contraseña
         user.save()
