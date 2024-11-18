@@ -13,7 +13,7 @@ class Usuario(AbstractUser):
     ]
     telefono = models.CharField(max_length=9,null=True,blank=True)
     url_linkedin = models.CharField(max_length=100, null=True, blank=True)
-    ##foto_perfil = models.ImageField(upload_to='fotos_perfil/', null=True, blank=True)
+    ##foto_perfil = models.ImageField(upload_to='fotos_perfil/', null=True, blank=True)  Arreglar foto de perfil de usuario
     rol =models.CharField(max_length=50,choices=TIPO_ROL_CHOICES,null=True,blank=True)
     rango =models.IntegerField(default=1)
     eventos_asistidos = models.IntegerField(default=0)
