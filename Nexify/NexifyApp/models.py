@@ -5,21 +5,22 @@ from django.utils import timezone
 
 # Modelo Usuario, base para otros roles
 class Usuario(AbstractUser):
-    TIPO_ROL_CHOICES =[
+    email = models.EmailField(unique=True)  # Hacer que el email sea único
+    telefono = models.CharField(max_length=9, null=True, blank=True)
+    url_linkedin = models.CharField(max_length=100, null=True, blank=True)
+    foto_perfil = models.ImageField(upload_to='fotos_perfil/', null=True, blank=True)
+    rol = models.CharField(max_length=50, choices=[
         ('Coordinador', 'Coordinador'),
         ('Participante', 'Participante'),
         ('Ponente', 'Ponente'),
         ('Moderador_Solicitud', 'Moderador_Solicitud'),
-    ]
-    telefono = models.CharField(max_length=9,null=True,blank=True)
-    url_linkedin = models.CharField(max_length=100, null=True, blank=True)
-    foto_perfil = models.ImageField(upload_to='fotos_perfil/', null=True, blank=True)
-    rol =models.CharField(max_length=50,choices=TIPO_ROL_CHOICES,null=True,blank=True)
-    rango =models.IntegerField(default=1)
-    eventos_asistidos = models.IntegerField(default=0)
+    ], null=True, blank=True)
+
+    USERNAME_FIELD = 'email'  # Establecer el correo electrónico como identificador único
+    REQUIRED_FIELDS = ['username']  # Campos requeridos además del correo electrónico
 
     def __str__(self):
-        return self.username  # De AbstractUser
+        return self.email
 
 # Modelo Coordinador, hereda de Usuario
 class Coordinador(Usuario):
@@ -35,13 +36,6 @@ class Ponente(Usuario):
 class Participante(Usuario):
     def __str__(self):
         return f'Participante: {self.username}'
-
-# Modelo Moderador_Solicitud, hereda de Usuario
-class ModeradorSolicitud(Usuario):
-    moderador_necesario = models.BooleanField(default=False)
-
-    def __str__(self):
-        return f'Moderador Solicitud: {self.username}'
 
 #Modelo de categoria de evento una tabla conectada a eventos para que eventos herede una categoria
 class CategoriaEvento(models.Model):
@@ -66,7 +60,6 @@ class Evento(models.Model):
     coordinador = models.ForeignKey(Usuario, limit_choices_to={'rol': 'Coordinador'}, on_delete=models.CASCADE, related_name='eventos_coordinados')
     ponente = models.ForeignKey(Usuario, limit_choices_to={'rol': 'Ponente'}, on_delete=models.CASCADE, related_name='eventos_ponentes')
     moderador_necesario = models.BooleanField(default=False)
-    moderador = models.ForeignKey(Usuario, limit_choices_to={'rol': 'Moderador_Solicitud'}, on_delete=models.SET_NULL, null=True, blank=True, related_name='eventos_moderados')
     participantes = models.ManyToManyField(Participante, through='Participantes', related_name='eventos')
     imagen = models.ImageField(upload_to='imagenes_eventos/', null=True, blank=True)
     hora_inicio = models.TimeField(null=True, blank=True)

@@ -6,16 +6,16 @@ from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .models import Chat, Mensaje, Evento
+from .models import Chat, Mensaje, Evento, Usuario
 from rest_framework.permissions import IsAuthenticated
 from .pusher import pusher_client
 from rest_framework.permissions import AllowAny
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
 from rest_framework.decorators import api_view
-from .models import Usuario
 from rest_framework.parsers import MultiPartParser, FormParser
-
+from django.contrib.auth.models import update_last_login
+from django.contrib.auth.hashers import make_password
 
 # ! Vista para manejar los eventos
 class EventoViewSet(viewsets.ModelViewSet):
@@ -47,8 +47,8 @@ class UsuarioViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
 
         # * Crear el usuario y guardar la contraseña hasheada
-        user = serializer.save()
-        user.set_password(serializer.validated_data['password'])
+        us = serializer.save()
+        userer.set_password(serializer.validated_data['password'])
         user.save()
 
         # * Construir respuesta
@@ -137,34 +137,62 @@ class LoginView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        # * Obtiene el nombre de usuario y la contraseña de la solicitud
-        username = request.data.get('username')
+        # Obtener las credenciales (correo electrónico y contraseña)
+        email = request.data.get('email')
         password = request.data.get('password')
 
-        # * Valida los datos de entrada
-        if not username or not password:
-            return Response({'error': 'Se requiere nombre de usuario y contraseña'}, status=status.HTTP_400_BAD_REQUEST)
+        # Validar datos de entrada
+        if not email or not password:
+            return Response({'error': 'Se requiere correo electrónico y contraseña'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # * Autentica al usuario
-        user = authenticate(username=username, password=password)
+        # Autenticar al usuario usando el correo electrónico
+        try:
+            user = Usuario.objects.get(email=email)
+        except Usuario.DoesNotExist:
+            return Response({'error': 'El correo electrónico no está registrado.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        user = authenticate(username=email, password=password)
         if user is not None:
-            # * Si la autenticación es exitosa, genera o recupera el token
+            # Generar o recuperar el token
             token, _ = Token.objects.get_or_create(user=user)
-            return Response({'token': token.key})
+
+            # Actualizar la última fecha de inicio de sesión
+            update_last_login(None, user)
+
+            return Response({
+                'token': token.key,
+                'rol': user.rol,  # Devolver el rol del usuario
+                'username': user.username
+            })
         else:
-            # * Si la autenticación falla, retorna un error
             return Response({'error': 'Credenciales incorrectas'}, status=status.HTTP_400_BAD_REQUEST)
         
 # ! RegisterView
-class RegisterView(APIView): # 
+class RegisterView(APIView):
     permission_classes = [AllowAny]
+
     def post(self, request):
-        serializer = UsuarioSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({"message": "Usuario registrado con éxito."}, status=status.HTTP_201_CREATED)
-        # * Devolver errores específicos
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # Obtener los datos enviados
+        email = request.data.get('email')
+        username = request.data.get('username')
+        password = request.data.get('password')
+        rol = request.data.get('rol')
+
+        # Validar los datos
+        if not email or not username or not password or not rol:
+            return Response({'error': 'Todos los campos son obligatorios.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if Usuario.objects.filter(email=email).exists():
+            return Response({'error': 'El correo electrónico ya está registrado.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Crear el usuario
+        user = Usuario.objects.create(
+            email=email,
+            username=username,
+            rol=rol,
+            password=make_password(password)  # Encriptar la contraseña
+        )
+        return Response({'message': 'Usuario registrado con éxito.'}, status=status.HTTP_201_CREATED)
     
 @api_view(['GET'])
 def coordinadores(request):
