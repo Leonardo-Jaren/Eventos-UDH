@@ -19,15 +19,20 @@ from rest_framework.parsers import MultiPartParser, FormParser
 
 # ! Vista para manejar los eventos
 class EventoViewSet(viewsets.ModelViewSet):
-    queryset = Evento.objects.all()
+    queryset = Evento.objects.all()  # Atributo necesario para el router
     serializer_class = EventoSerializer
-    permission_classes = [AllowAny] #  AllowAny
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        # Ordenar los eventos por la fecha de creación descendente
+        return Evento.objects.all().order_by('-fecha_evento')
 
     def create(self, request, *args, **kwargs):
-        # * Aquí puedes personalizar la creación del evento
+        # Personalizar la creación del evento si es necesario
         return super().create(request, *args, **kwargs)
 
     def list(self, request, *args, **kwargs):
+        # Si necesitas realizar algún procesamiento adicional en la lista
         return super().list(request, *args, **kwargs)
 
 # ! Usuarios APIview   
