@@ -16,6 +16,8 @@ from rest_framework.decorators import api_view
 from .models import Usuario
 
 
+
+
 # Vista para manejar los eventos
 class EventoViewSet(viewsets.ModelViewSet):
     queryset = Evento.objects.all()
@@ -100,6 +102,17 @@ class UsuarioViewSet(viewsets.ModelViewSet):
         
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+    
+class PerfilUsuarioAPIView(APIView):
+    permission_classes = [IsAuthenticated]  # Asegura que solo los usuarios autenticados accedan
+
+    def get(self, request):
+        # Obtiene el usuario autenticado
+        usuario = request.user
+        # Serializa los datos del usuario
+        serializer = UsuarioSerializer(usuario)
+        return Response(serializer.data)
+    
 
 #CategoriaEventoViewSet
 class CategoriaEventoViewSet(viewsets.ModelViewSet):
@@ -144,6 +157,20 @@ class RegisterView(APIView):
         # Devolver errores específicos
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+    
+    
+@api_view(['GET'])
+def usuarios_por_rol(request, rol):
+    """
+    Retorna una lista de usuarios según el rol especificado.
+    """
+    usuarios = Usuario.objects.filter(rol=rol.capitalize())
+    serializer = UsuarioSerializer(usuarios, many=True)
+    return Response(serializer.data)
+
+
+
+    
 @api_view(['GET'])
 def coordinadores(request):
     coordinadores = Usuario.objects.filter(rol='Coordinador')
@@ -161,3 +188,4 @@ def moderadores(request):
     moderadores = Usuario.objects.filter(rol='Moderador_Solicitud')
     serializer = UsuarioSerializer(moderadores, many=True)
     return Response(serializer.data)
+    

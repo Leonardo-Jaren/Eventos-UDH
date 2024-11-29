@@ -20,7 +20,7 @@ class MensajeSerializer(serializers.ModelSerializer):
 class UsuarioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Usuario
-        fields = ['username', 'password', 'email', 'rol', 'telefono']
+        fields = ['id','username', 'password', 'email', 'rol', 'telefono']
         extra_kwargs = {
             'password': {'write_only': True},  # No devolver la contraseña en las respuestas
         }
