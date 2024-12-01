@@ -3,7 +3,7 @@ from . import views
 from django.urls import path, include
 from .views import (
     EventoViewSet, ChatAPIView, MensajeAPIView,
-    CategoriaEventoViewSet, usuarios_por_rol
+    CategoriaEventoViewSet      
 )
 from django.conf import settings
 from django.conf.urls.static import static
@@ -24,11 +24,7 @@ urlpatterns = [
     path('chat/<int:evento_id>/', ChatAPIView.as_view(), name='chat'),
     path('mensaje/<int:chat_id>/', MensajeAPIView.as_view(), name='mensaje'),
     
-    # Ruta para obtener el perfil del usuario autenticado
-    path('perfil/', views.PerfilUsuarioAPIView.as_view(), name='perfil-usuario'),
-    
     # Rutas para roles específicos
-    path('usuarios/<str:rol>/', usuarios_por_rol, name='usuarios-por-rol'),
     path('coordinadores/', views.coordinadores, name='coordinadores'),
     path('ponentes/', views.ponentes, name='ponentes'),
     path('moderadores/', views.moderadores, name='moderadores'),
