@@ -168,32 +168,31 @@ class LoginView(APIView):
             return Response({'error': 'Credenciales incorrectas'}, status=status.HTTP_400_BAD_REQUEST)
         
 # ! RegisterView
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.permissions import AllowAny
+from django.contrib.auth.hashers import make_password
+from .models import Usuario
+from .serializers import UsuarioSerializer
+
 class RegisterView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        # Obtener los datos enviados
-        email = request.data.get('email')
-        username = request.data.get('username')
-        password = request.data.get('password')
-        rol = request.data.get('rol')
+        # Usar el serializer para validar y crear el usuario
+        serializer = UsuarioSerializer(data=request.data)
+        
+        if serializer.is_valid():
+            # Sobrescribir el rol para mayor seguridad
+            serializer.validated_data['rol'] = 'Participante'
+            serializer.validated_data['password'] = make_password(serializer.validated_data['password'])  # Hashear la contraseña
+            serializer.save()
+            
+            return Response({'message': 'Usuario registrado con éxito.'}, status=status.HTTP_201_CREATED)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        # Validar los datos
-        if not email or not username or not password or not rol:
-            return Response({'error': 'Todos los campos son obligatorios.'}, status=status.HTTP_400_BAD_REQUEST)
-
-        if Usuario.objects.filter(email=email).exists():
-            return Response({'error': 'El correo electrónico ya está registrado.'}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Crear el usuario
-        user = Usuario.objects.create(
-            email=email,
-            username=username,
-            rol=rol,
-            password=make_password(password)  # Encriptar la contraseña
-        )
-        return Response({'message': 'Usuario registrado con éxito.'}, status=status.HTTP_201_CREATED)
-    
 @api_view(['GET'])
 def coordinadores(request):
     coordinadores = Usuario.objects.filter(rol='Coordinador')

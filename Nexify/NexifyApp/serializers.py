@@ -5,7 +5,7 @@ from .models import Evento, Chat, Mensaje, Usuario
 class EventoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Evento
-        fields = '__all__'  # O especifica los campos que quieras
+        fields = '__all__'
 
 class ChatSerializer(serializers.ModelSerializer):
     class Meta:
@@ -20,7 +20,7 @@ class MensajeSerializer(serializers.ModelSerializer):
 class UsuarioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Usuario
-        fields = ['username', 'password', 'email', 'rol', 'telefono', 'foto_perfil']
+        fields = ['id', 'username', 'password', 'email', 'rol', 'telefono', 'foto_perfil']
         extra_kwargs = {
             'password': {'write_only': True},  # No devolver la contraseña en las respuestas
             'foto_perfil': {'required': False},  # Campo opcional
