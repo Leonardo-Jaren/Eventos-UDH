@@ -211,3 +211,4 @@ def moderadores(request):
     moderadores = Usuario.objects.filter(rol='Moderador_Solicitud')
     serializer = UsuarioSerializer(moderadores, many=True)
     return Response(serializer.data)
+    
