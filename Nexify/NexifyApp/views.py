@@ -160,6 +160,7 @@ class LoginView(APIView):
             update_last_login(None, user)
 
             return Response({
+                'userid':user.pk,
                 'token': token.key,
                 'rol': user.rol,  # Devolver el rol del usuario
                 'username': user.username
