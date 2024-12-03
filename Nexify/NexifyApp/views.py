@@ -1,12 +1,12 @@
 from django.shortcuts import render
 from rest_framework import viewsets
 from . import models, serializers
-from .serializers import EventoSerializer, ChatSerializer, MensajeSerializer, UsuarioSerializer
+from .serializers import EventoSerializer, ChatSerializer, MensajeSerializer, UsuarioSerializer, ParticipantesSerializer
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .models import Chat, Mensaje, Evento, Usuario
+from .models import Chat, Mensaje, Evento, Usuario, Participantes
 from rest_framework.permissions import IsAuthenticated
 from .pusher import pusher_client
 from rest_framework.permissions import AllowAny
@@ -168,14 +168,6 @@ class LoginView(APIView):
             return Response({'error': 'Credenciales incorrectas'}, status=status.HTTP_400_BAD_REQUEST)
         
 # ! RegisterView
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.permissions import AllowAny
-from django.contrib.auth.hashers import make_password
-from .models import Usuario
-from .serializers import UsuarioSerializer
-
 class RegisterView(APIView):
     permission_classes = [AllowAny]
 
@@ -210,3 +202,35 @@ def moderadores(request):
     moderadores = Usuario.objects.filter(rol='Moderador_Solicitud')
     serializer = UsuarioSerializer(moderadores, many=True)
     return Response(serializer.data)
+
+# ! InscripcionViewSet
+class InscripcionViewSet(viewsets.ModelViewSet):
+    queryset = Participantes.objects.all()
+    serializer_class = ParticipantesSerializer
+
+# ! Ruta par inscribirse a un evento
+class InscripcionEventoAPIView(APIView):
+    
+    permission_classes = [IsAuthenticated]  # Solo los usuarios autenticados pueden inscribirse
+
+    def post(self, request, evento_id):
+        # Obtener el usuario autenticado
+        usuario = request.user
+
+        # Verificar si el usuario tiene el rol 'Participante'
+        if usuario.rol != 'Participante':
+            return Response({"error": "Solo los participantes pueden inscribirse a un evento."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Verificar si el evento existe
+        evento = Evento.objects.filter(id=evento_id).first()
+        if not evento:
+            return Response({"error": "El evento no existe."}, status=status.HTTP_404_NOT_FOUND)
+        
+        # Verificar si el participante ya está inscrito en el evento
+        if Participantes.objects.filter(evento=evento, usuario=usuario).exists():
+            return Response({"message": "Ya estás inscrito en este evento."}, status=status.HTTP_200_OK)
+        
+        # Crear la inscripción
+        Participantes.objects.create(evento=evento, usuario=usuario, fecha_asistencia=evento.fecha_evento.date())
+
+        return Response({"message": f"Te has inscrito correctamente al evento: {evento.nombre_evento}"}, status=status.HTTP_201_CREATED)

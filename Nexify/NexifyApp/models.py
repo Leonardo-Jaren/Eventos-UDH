@@ -61,7 +61,6 @@ class Evento(models.Model):
     ubicacion = models.CharField(max_length=255, null=True, blank=True)
     coordinador = models.ForeignKey(Usuario, limit_choices_to={'rol': 'Coordinador'}, on_delete=models.CASCADE, related_name='eventos_coordinados')
     ponente = models.ForeignKey(Usuario, limit_choices_to={'rol': 'Ponente'}, on_delete=models.CASCADE, related_name='eventos_ponentes')
-    moderador_necesario = models.BooleanField(default=False)
     participantes = models.ManyToManyField(Participante, through='Participantes', related_name='eventos')
     imagen = models.ImageField(upload_to='imagenes_eventos/', null=True, blank=True)
     hora_inicio = models.TimeField(null=True, blank=True)
@@ -85,9 +84,6 @@ class Evento(models.Model):
             return "Culminado"
 
     def clean(self):
-        # Validar que si moderador_necesario es True, moderador debe ser requerido
-        if self.moderador_necesario and self.moderador is None:
-            raise ValidationError("Debe asignar un moderador si el campo 'moderador_necesario' está activado.")
         if self.tipo_evento == 'Presencial' and not self.ubicacion:
             raise ValidationError("La ubicación es requerida si el evento es presencial.")
 
