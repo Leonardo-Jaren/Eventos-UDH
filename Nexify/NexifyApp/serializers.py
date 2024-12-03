@@ -2,11 +2,6 @@ from rest_framework import serializers
 from . import models
 from .models import Evento, Chat, Mensaje, Usuario
 
-class EventoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Evento
-        fields = '__all__'
-
 class ChatSerializer(serializers.ModelSerializer):
     class Meta:
         model = Chat
@@ -64,4 +59,14 @@ class ParticipanteSerializer(serializers.ModelSerializer):
 class CategoriaEventoSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.CategoriaEvento
+        fields = '__all__'
+
+class EventoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Evento
+        fields = '__all__'
+
+class ParticipantesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Participantes
         fields = '__all__'
